@@ -6,21 +6,11 @@
     "node": true,
     "mocha": true,
   },
-  "plugins": [
-    "react"
-  ],
-  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "extends": ["eslint:recommended"],
   "globals": {
     "$": true
   },
-  "parser": "babel-eslint",
-  "parserOptions": {
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true,
-      "modules": true
-    }
-  },
+  "parserOptions": { "ecmaVersion": 11 },
   "rules": {
     "brace-style": "error",
     "camelcase": ["error", { "properties": "never" }],
@@ -30,6 +20,7 @@
     "indent": [ "error", 2, { "SwitchCase": 1 } ],
     "key-spacing": [ "error", { "beforeColon": false } ],
     "no-console": "off",
+    object-property-newline: "error",
     "no-fallthrough": "warn",
     "prefer-const": "error",
     "quotes": [ "error", "single" ],

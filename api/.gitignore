@@ -6,13 +6,15 @@
 .pnp.js
 certs/*.crt
 certs/*.key
+.config
+.masterkey
+.mastersalt
 
 # testing
 /coverage
 
 # production
 /build
-.keyfile
 
 # misc
 .DS_Store
