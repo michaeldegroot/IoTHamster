@@ -6,6 +6,7 @@ class Cipherchain {
   constructor() {}
 
   async hash(key, salt, length = 64) {
+    debug(`Hashing ${length} length key`)
     const argon2output = await argon2.hash(key, {
       raw: true,
       hashLength: parseInt(length),
@@ -14,14 +15,22 @@ class Cipherchain {
     return argon2output.toString('hex')
   }
 
+  async genMaster() {
+    return await this.hash(this.modules.masterkey.masterkey, this.modules.masterkey.mastersalt)
+  }
+
+  async compareMaster(comparison) {
+    return (await this.hash(comparison, this.modules.masterkey.mastersalt)) === this.secret
+  }
+
   async start(modules) {
     this.modules = modules
-    debug('Spinning up cipher-chain')
-    this.secret = await this.hash(modules.masterkey.masterkey, modules.masterkey.mastersalt)
+    this.secret = await this.genMaster()
     await this.bootCipherChain()
   }
 
   async bootCipherChain() {
+    debug('Spinning up cipher-chain instance')
     this.cipherchain = await new CipherChain({
       secret: this.secret,
       chain: 'aes-256-gcm',

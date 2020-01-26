@@ -1,7 +1,4 @@
 const Knex = require('knex')
-const fs = require('fs')
-const path = require('path')
-const _ = require('lodash')
 const debug = require('debug')('iothamster:database')
 
 class Database {

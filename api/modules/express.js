@@ -73,12 +73,16 @@ class Express {
 
     debug.web = require('debug')('iothamster:web')
     const bindIp = process.env.BIND_ADDRESS ? process.env.BIND_ADDRESS : '0.0.0.0'
-    http.createServer(app).listen(process.env.API_HTTP_PORT, bindIp, () => {
-      debug.web(`HTTP Listening on ${bindIp}:${process.env.API_HTTP_PORT}`)
-    })
-    https.createServer(options, app).listen(process.env.API_HTTPS_PORT, bindIp, () => {
-      debug.web(`HTTPS Listening on ${bindIp}:${process.env.API_HTTPS_PORT}`)
-    })
+    if (process.env.API_HTTP_PORT) {
+      http.createServer(app).listen(process.env.API_HTTP_PORT, bindIp, () => {
+        debug.web(`HTTP Listening on ${bindIp}:${process.env.API_HTTP_PORT}`)
+      })
+    }
+    if (process.env.API_HTTPS_PORT) {
+      https.createServer(options, app).listen(process.env.API_HTTPS_PORT, bindIp, () => {
+        debug.web(`HTTPS Listening on ${bindIp}:${process.env.API_HTTPS_PORT}`)
+      })
+    }
   }
 }
 
