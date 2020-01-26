@@ -11,26 +11,26 @@ class Express {
 
   async start(modules) {
     // EXPRESS
-    const app = express()
-    app.use(require('cors')())
+    this.app = express()
+    this.app.use(require('cors')())
     if (process.env.LOG_EXPRESS === 1) {
-      app.use(require('morgan')('dev'))
+      this.app.use(require('morgan')('dev'))
     }
-    app.use(express.json())
-    app.use(express.urlencoded({ extended: true }))
-    app.use(require('cookie-parser')())
+    this.app.use(express.json())
+    this.app.use(express.urlencoded({ extended: true }))
+    this.app.use(require('cookie-parser')())
     if (!process.env.SESSION_SECRET) {
       throw 'SESSION_SECRET not set in .env'
     }
-    app.use(
+    this.app.use(
       require('express-session')({
         secret: process.env.SESSION_SECRET,
         resave: true,
         saveUninitialized: true
       })
     )
-    app.use(modules.passport.passport.initialize())
-    app.use(modules.passport.passport.session())
+    this.app.use(modules.passport.passport.initialize())
+    this.app.use(modules.passport.passport.session())
 
     // MIDDLEWARE
     debug.middleware = require('debug')('iothamster:middleware')
@@ -38,7 +38,7 @@ class Express {
     if (!override) {
       debug.middleware('OVERRIDE_SSL_CHECK = 1')
     }
-    app.use((req, res, next) => {
+    this.app.use((req, res, next) => {
       if (!req.connection.encrypted && override) {
         return res.json({ status: 405 })
       }
@@ -52,16 +52,20 @@ class Express {
       const basename = path.basename(file, '.js')
       routes[basename] = require(file)
     }
-    app.use('/', routes.index)
-    app.use('/api', modules.passport.passport.authenticate('jwt'), routes.api)
+
+    for (const file of routeFiles) {
+      const basename = path.basename(file, '.js')
+      const Class = routes[basename]
+      routes[basename] = new Class(modules)
+    }
 
     // 404
-    app.use(function(req, res) {
+    this.app.use(function(req, res) {
       return res.json({ status: 404 })
     })
 
     // ERROR
-    app.use(function(err, req, res) {
+    this.app.use(function(err, req, res) {
       console.log(err)
       res.json({ status: 500 })
     })
@@ -74,12 +78,12 @@ class Express {
     debug.web = require('debug')('iothamster:web')
     const bindIp = process.env.BIND_ADDRESS ? process.env.BIND_ADDRESS : '0.0.0.0'
     if (process.env.API_HTTP_PORT) {
-      http.createServer(app).listen(process.env.API_HTTP_PORT, bindIp, () => {
+      http.createServer(this.app).listen(process.env.API_HTTP_PORT, bindIp, () => {
         debug.web(`HTTP Listening on ${bindIp}:${process.env.API_HTTP_PORT}`)
       })
     }
     if (process.env.API_HTTPS_PORT) {
-      https.createServer(options, app).listen(process.env.API_HTTPS_PORT, bindIp, () => {
+      https.createServer(options, this.app).listen(process.env.API_HTTPS_PORT, bindIp, () => {
         debug.web(`HTTPS Listening on ${bindIp}:${process.env.API_HTTPS_PORT}`)
       })
     }
