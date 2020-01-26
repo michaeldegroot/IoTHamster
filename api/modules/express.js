@@ -70,18 +70,24 @@ class Express {
       res.json({ status: 500 })
     })
 
+    // SSL
     const options = {
       key: fs.readFileSync(path.join(__dirname, '..', 'certs', 'certificate.key')),
       cert: fs.readFileSync(path.join(__dirname, '..', 'certs', 'certificate.crt'))
     }
 
+    // BIND ADDRESS
     debug.web = require('debug')('iothamster:web')
     const bindIp = process.env.BIND_ADDRESS ? process.env.BIND_ADDRESS : '0.0.0.0'
+
+    // HTTP
     if (process.env.API_HTTP_PORT) {
       http.createServer(this.app).listen(process.env.API_HTTP_PORT, bindIp, () => {
         debug.web(`HTTP Listening on ${bindIp}:${process.env.API_HTTP_PORT}`)
       })
     }
+
+    // HTTPS
     if (process.env.API_HTTPS_PORT) {
       https.createServer(options, this.app).listen(process.env.API_HTTPS_PORT, bindIp, () => {
         debug.web(`HTTPS Listening on ${bindIp}:${process.env.API_HTTPS_PORT}`)
