@@ -1,5 +1,6 @@
 const debug = require('debug')('iothamster')
 const _ = require('lodash')
+const glob = require('glob')
 
 class IoTHamster {
   constructor() {

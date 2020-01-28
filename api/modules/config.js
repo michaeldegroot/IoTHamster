@@ -89,6 +89,7 @@ class Config {
     for (const delKey of delKeys) {
       debug(`deleting key ${delKey} = ${this.config[delKey]}`)
       delete this.config[delKey]
+      delete process.env[delKey]
     }
     if (delKeys.length >= 1 || newKeys.length >= 1) {
       await this.updateConfig(this.config, true)

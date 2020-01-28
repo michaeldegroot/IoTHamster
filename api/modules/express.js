@@ -6,9 +6,20 @@ const path = require('path')
 const glob = require('glob')
 const debug = require('debug')('iothamster:express')
 
+const certificateKey = path.join(__dirname, '..', 'certs', 'express', 'certificate.key')
+const certificateCa = path.join(__dirname, '..', 'certs', 'express', 'certificate.crt')
+
 class Express {
   constructor() {
     this.app = express()
+
+    if (!fs.existsSync(certificateKey)) {
+      throw new Error(`${certificateKey} does not exists`)
+    }
+
+    if (!fs.existsSync(certificateCa)) {
+      throw new Error(`${certificateCa} does not exists`)
+    }
   }
 
   async start(modules) {
@@ -76,8 +87,8 @@ class Express {
 
     // SSL
     const options = {
-      key: fs.readFileSync(path.join(__dirname, '..', 'certs', 'express', 'certificate.key')),
-      cert: fs.readFileSync(path.join(__dirname, '..', 'certs', 'express', 'certificate.crt'))
+      key: fs.readFileSync(certificateKey),
+      cert: fs.readFileSync(certificateCa)
     }
 
     // BIND ADDRESS

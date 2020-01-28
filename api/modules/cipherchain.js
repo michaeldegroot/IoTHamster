@@ -46,11 +46,6 @@ class Cipherchain {
         }
       }
     }
-
-    if (process.env.ENCRYPTION_AT_REST == 1) {
-      options.knex = this.modules.database.knex
-    }
-    debug(`ENCRYPTION_AT_REST = ${process.env.ENCRYPTION_AT_REST}`)
     this.cipherchain = await new CipherChain(options)
   }
 }

@@ -15,7 +15,7 @@ class Database {
     debug('Migrating done')
 
     // Reboot cipherchain because now knex is loaded
-    await modules.cipherchain.bootCipherChain()
+    await modules.cipherchain.cipherchain.knexHook()
 
     await this.knex('logs').insert([
       {

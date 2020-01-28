@@ -28,6 +28,7 @@ exports.up = function(knex) {
       t.text('createdAt').notNull()
       t.text('updatedAt').nullable()
 
+      t.text('topic').notNull()
       t.text('if').notNull()
       t.text('then').notNull()
     })

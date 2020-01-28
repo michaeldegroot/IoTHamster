@@ -3,8 +3,15 @@ const fs = require('fs')
 const path = require('path')
 const debug = require('debug')('iothamster:mqtt')
 
+const certificate = path.join(__dirname, '..', 'certs', 'mqtt', 'certificate.crt')
+
 class Mqtt {
-  constructor() {}
+  constructor() {
+    this.connected = false
+    if (!fs.existsSync(certificate)) {
+      throw new Error(`${certificate} does not exists`)
+    }
+  }
 
   async start(modules) {
     debug(`Trying to connect to ${process.env.MQTT_HOST}`)
@@ -19,7 +26,7 @@ class Mqtt {
         protocol: 'mqtts',
         rejectUnauthorized: !!+process.env.MQTT_REJECT_UNAUTHORIZED,
         secureProtocol: process.env.MQTT_TLS_METHOD,
-        ca: fs.readFileSync(path.join(__dirname, '..', 'certs', 'mqtt', 'server.crt')),
+        ca: fs.readFileSync(certificate),
         reconnectPeriod: 1000
       })
     } catch (e) {
@@ -27,8 +34,10 @@ class Mqtt {
       process.exit()
     }
     debug('connected')
+    this.connected = true
 
     this.client.on('connect', function() {
+      this.connected = true
       debug('event connect')
       // this.client.subscribe('presence', function(err) {
       //   if (!err) {
@@ -38,11 +47,17 @@ class Mqtt {
     })
 
     this.client.on('offline', function() {
+      this.connected = false
       debug('event offline')
     })
 
     this.client.on('reconnect', function() {
       debug('event reconnect')
+    })
+
+    this.client.on('disconnect', function() {
+      this.connected = false
+      debug('event disconnect')
     })
 
     this.client.on('error', function(error) {
