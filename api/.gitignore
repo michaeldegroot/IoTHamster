@@ -6,8 +6,8 @@
 .pnp.js
 
 # certs
-certs/*.crt
-certs/*.key
+certs/**/*.crt
+certs/**/*.key
 
 # secrets or configs
 .config*

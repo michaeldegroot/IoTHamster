@@ -32,6 +32,11 @@ class Express {
     this.app.use(modules.passport.passport.initialize())
     this.app.use(modules.passport.passport.session())
 
+    if (process.env.GENTOKEN == 1) {
+      debug(modules.jwt.issue('web', '6years'))
+      process.exit()
+    }
+
     // MIDDLEWARE
     const override = !(0 | process.env.OVERRIDE_SSL_CHECK)
     if (!override) {
@@ -71,8 +76,8 @@ class Express {
 
     // SSL
     const options = {
-      key: fs.readFileSync(path.join(__dirname, '..', 'certs', 'certificate.key')),
-      cert: fs.readFileSync(path.join(__dirname, '..', 'certs', 'certificate.crt'))
+      key: fs.readFileSync(path.join(__dirname, '..', 'certs', 'express', 'certificate.key')),
+      cert: fs.readFileSync(path.join(__dirname, '..', 'certs', 'express', 'certificate.crt'))
     }
 
     // BIND ADDRESS

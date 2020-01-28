@@ -9,17 +9,22 @@ class Config {
     this.configFile = path.join(__dirname, '..', '.config')
     this.config = {}
     this.defaultConfig = {
-      API_HTTP_PORT: 80,
-      API_HTTPS_PORT: 443,
-      OVERRIDE_SSL_CHECK: 0,
-      LOG_EXPRESS: 0,
-      DEVICE_MONITOR_INTERVAL: 5000,
+      API_HTTP_PORT: '80',
+      API_HTTPS_PORT: '443',
+      OVERRIDE_SSL_CHECK: '0',
+      LOG_EXPRESS: '0',
+      DEVICE_MONITOR_INTERVAL: '5000',
       BIND_ADDRESS: '127.0.0.1',
-      ENCRYPTION_AT_REST: 1,
+      ENCRYPTION_AT_REST: '1',
       DATABASE_HOST: 'localhost',
       DATABASE_USER: 'username',
       DATABASE_PASSWORD: 'password',
-      DATABASE_DATABASE: 'database'
+      DATABASE_DATABASE: 'database',
+      MQTT_HOST: 'localhost',
+      MQTT_USER: 'mqtt',
+      MQTT_PASSWORD: 'mqtt',
+      MQTT_TLS_METHOD: 'TLSv1_1_method',
+      MQTT_REJECT_UNAUTHORIZED: '1'
     }
   }
 

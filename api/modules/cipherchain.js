@@ -30,10 +30,10 @@ class Cipherchain {
 
   async bootCipherChain() {
     debug('Spinning up cipher-chain instance')
-    this.cipherchain = await new CipherChain({
+
+    const options = {
       secret: this.secret,
       chain: 'aes-256-gcm',
-      knex: this.modules.database.knex,
       compressData: false,
       kdf: {
         use: 'argon2',
@@ -45,7 +45,13 @@ class Cipherchain {
           }
         }
       }
-    })
+    }
+
+    if (process.env.ENCRYPTION_AT_REST == 1) {
+      options.knex = this.modules.database.knex
+    }
+    debug(`ENCRYPTION_AT_REST = ${process.env.ENCRYPTION_AT_REST}`)
+    this.cipherchain = await new CipherChain(options)
   }
 }
 

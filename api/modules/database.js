@@ -16,6 +16,14 @@ class Database {
 
     // Reboot cipherchain because now knex is loaded
     await modules.cipherchain.bootCipherChain()
+
+    await this.knex('logs').insert([
+      {
+        event: 'ApiServer',
+        log: 'Started server',
+        createdAt: Date.now()
+      }
+    ])
   }
 }
 
