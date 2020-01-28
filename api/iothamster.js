@@ -1,8 +1,9 @@
 const debug = require('debug')('iothamster')
+const _ = require('lodash')
 
 class IoTHamster {
   constructor() {
-    const modules = ['masterkey', 'cipherchain', 'config', 'jwt', 'database', 'passport', 'express']
+    const modules = ['masterkey', 'cipherchain', 'config', 'jwt', 'database', 'passport', 'express', 'monitor']
     this.modules = {}
     debug(`loading ${modules.length} modules`)
     for (const module of modules) {
@@ -19,8 +20,12 @@ class IoTHamster {
 
   async startModules() {
     debug(`starting ${Object.keys(this.modules).length} modules`)
-    for (const module in this.modules) {
-      await this.modules[module].start(this.modules)
+    for (const i in this.modules) {
+      const module = this.modules[i]
+      if (!_.get(module, 'start')) {
+        throw `Need start method in ${module.__name__}`
+      }
+      await module.start(this.modules)
     }
 
     return true

@@ -4,14 +4,15 @@ const express = require('express')
 const fs = require('fs')
 const path = require('path')
 const glob = require('glob')
-const debug = {}
+const debug = require('debug')('iothamster:express')
 
 class Express {
-  constructor() {}
+  constructor() {
+    this.app = express()
+  }
 
   async start(modules) {
     // EXPRESS
-    this.app = express()
     this.app.use(require('cors')())
     if (process.env.LOG_EXPRESS === 1) {
       this.app.use(require('morgan')('dev'))
@@ -19,12 +20,11 @@ class Express {
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: true }))
     this.app.use(require('cookie-parser')())
-    if (!process.env.SESSION_SECRET) {
-      throw 'SESSION_SECRET not set in .env'
-    }
+
+    const mastersalt = fs.readFileSync(path.join(__dirname, '..', '.mastersalt'))
     this.app.use(
       require('express-session')({
-        secret: process.env.SESSION_SECRET,
+        secret: await modules.cipherchain.hash(`${modules.cipherchain.secret}session`, mastersalt, 128),
         resave: true,
         saveUninitialized: true
       })
@@ -33,10 +33,9 @@ class Express {
     this.app.use(modules.passport.passport.session())
 
     // MIDDLEWARE
-    debug.middleware = require('debug')('iothamster:middleware')
     const override = !(0 | process.env.OVERRIDE_SSL_CHECK)
     if (!override) {
-      debug.middleware('OVERRIDE_SSL_CHECK = 1')
+      debug('OVERRIDE_SSL_CHECK = 1')
     }
     this.app.use((req, res, next) => {
       if (!req.connection.encrypted && override) {
@@ -77,20 +76,19 @@ class Express {
     }
 
     // BIND ADDRESS
-    debug.web = require('debug')('iothamster:web')
     const bindIp = process.env.BIND_ADDRESS ? process.env.BIND_ADDRESS : '0.0.0.0'
 
     // HTTP
     if (process.env.API_HTTP_PORT) {
       http.createServer(this.app).listen(process.env.API_HTTP_PORT, bindIp, () => {
-        debug.web(`HTTP Listening on ${bindIp}:${process.env.API_HTTP_PORT}`)
+        debug(`HTTP Listening on ${bindIp}:${process.env.API_HTTP_PORT}`)
       })
     }
 
     // HTTPS
     if (process.env.API_HTTPS_PORT) {
       https.createServer(options, this.app).listen(process.env.API_HTTPS_PORT, bindIp, () => {
-        debug.web(`HTTPS Listening on ${bindIp}:${process.env.API_HTTPS_PORT}`)
+        debug(`HTTPS Listening on ${bindIp}:${process.env.API_HTTPS_PORT}`)
       })
     }
   }

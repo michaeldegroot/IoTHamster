@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const argon2 = require('argon2')
 const CipherChain = require('cipher-chain')
 const debug = require('debug')('iothamster:cipherchain')
@@ -5,8 +6,14 @@ const debug = require('debug')('iothamster:cipherchain')
 class Cipherchain {
   constructor() {}
 
-  async hash(key, salt, length = 64) {
-    debug(`Hashing ${length} length key`)
+  async hash(key, salt, length = 128) {
+    let presalt = 'with random salt (12)'
+    if (!salt) {
+      salt = crypto.randomBytes(6).toString('hex')
+    } else {
+      presalt = `with pre-defined salt (${salt.length})`
+    }
+    debug(`Hashing ${length} length key`, presalt)
     const argon2output = await argon2.hash(key, {
       raw: true,
       hashLength: parseInt(length),
@@ -15,17 +22,9 @@ class Cipherchain {
     return argon2output.toString('hex')
   }
 
-  async genMaster() {
-    return await this.hash(this.modules.masterkey.masterkey, this.modules.masterkey.mastersalt)
-  }
-
-  async compareMaster(comparison) {
-    return (await this.hash(comparison, this.modules.masterkey.mastersalt)) === this.secret
-  }
-
   async start(modules) {
     this.modules = modules
-    this.secret = await this.genMaster()
+    this.secret = await this.hash(this.modules.masterkey.masterkey, this.modules.masterkey.mastersalt)
     await this.bootCipherChain()
   }
 
@@ -38,11 +37,11 @@ class Cipherchain {
       compressData: false,
       kdf: {
         use: 'argon2',
-        saltLength: 8,
+        saltLength: 12,
         options: {
           argon2: {
             memoryCost: 1024 * 8,
-            timeCost: 4
+            timeCost: 8
           }
         }
       }

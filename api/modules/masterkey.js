@@ -45,11 +45,7 @@ class Masterkey {
             name: 'password',
             message: 'What master password would you like to use?',
             validate: val => {
-              if (val.length <= 1) {
-                return false
-              }
-
-              return true
+              return val !== ''
             }
           })
           this.masterkey = response.password
@@ -58,7 +54,7 @@ class Masterkey {
             type: 'confirm',
             name: 'value',
             message: 'Do you want to save the masterkey to a .masterkey file for easy booting? (lowers security)',
-            initial: true
+            initial: false
           })
 
           if (save.value) {

@@ -1,4 +1,4 @@
-const crypto = require('crypto')
+const debug = require('debug')('iothamster:config')
 const _ = require('lodash')
 const path = require('path')
 const prompts = require('prompts')
@@ -9,12 +9,11 @@ class Config {
     this.configFile = path.join(__dirname, '..', '.config')
     this.config = {}
     this.defaultConfig = {
-      JWT_SECRET: crypto.randomBytes(128).toString('hex'),
-      SESSION_SECRET: crypto.randomBytes(128).toString('hex'),
       API_HTTP_PORT: 80,
       API_HTTPS_PORT: 443,
       OVERRIDE_SSL_CHECK: 0,
       LOG_EXPRESS: 0,
+      DEVICE_MONITOR_INTERVAL: 5000,
       BIND_ADDRESS: '127.0.0.1',
       ENCRYPTION_AT_REST: 1,
       DATABASE_HOST: 'localhost',
@@ -28,9 +27,9 @@ class Config {
     const returnVals = values
     for (const val in values) {
       const response = await prompts({
-        type: 'text',
+        type: typeof values[val] === 'string' ? 'text' : 'number',
         name: val,
-        initial: String(values[val]),
+        initial: values[val],
         message: `${val}: `
       })
       returnVals[val] = response[val]
@@ -55,10 +54,35 @@ class Config {
       }
       console.log(e.message)
     }
-    this.config = JSON.parse(config)
+
+    try {
+      this.config = JSON.parse(config)
+    } catch (e) {
+      fs.unlinkSync(this.configFile)
+      console.log(e.message)
+      throw '.config is corrupt, removed'
+    }
 
     for (const key in this.config) {
       process.env[key] = this.config[key]
+    }
+
+    const newKeys = _.difference(Object.keys(this.defaultConfig), Object.keys(this.config))
+    const delKeys = _.difference(Object.keys(this.config), Object.keys(this.defaultConfig))
+    for (const newKey of newKeys) {
+      debug(`inserting key ${newKey} = ${this.defaultConfig[newKey]}`)
+      this.config[newKey] = this.defaultConfig[newKey]
+    }
+
+    for (const delKey of delKeys) {
+      debug(`deleting key ${delKey} = ${this.config[delKey]}`)
+      delete this.config[delKey]
+    }
+    if (delKeys.length >= 1 || newKeys.length >= 1) {
+      await this.updateConfig(this.config, true)
+      debug(`deleted ${delKeys.length} keys`)
+      debug(`inserted ${newKeys.length} keys`)
+      return await this.readConfig()
     }
 
     return this.config
@@ -68,15 +92,25 @@ class Config {
     return fs.unlinkSync(this.configFile)
   }
 
-  async updateConfig(newConfig) {
+  async updateConfig(newConfig, force = false) {
     let oldConfig = {}
-    try {
-      oldConfig = await this.modules.cipherchain.cipherchain.decrypt(fs.readFileSync(this.configFile, 'utf-8'))
-    } catch (e) {}
-    try {
-      oldConfig = JSON.parse(oldConfig)
-    } catch (e) {}
-    const writeConfig = _.merge({}, oldConfig, newConfig)
+
+    if (fs.existsSync(this.configFile)) {
+      try {
+        oldConfig = await this.modules.cipherchain.cipherchain.decrypt(fs.readFileSync(this.configFile, 'utf-8'))
+      } catch (e) {
+        debug(`error decrypting: ${e}`)
+      }
+      try {
+        oldConfig = JSON.parse(oldConfig)
+      } catch (e) {
+        debug(`error json parsing: ${e}`)
+      }
+    }
+    let writeConfig = _.merge({}, oldConfig, newConfig)
+    if (force) {
+      writeConfig = newConfig
+    }
     const encrypted = await this.modules.cipherchain.cipherchain.encrypt(JSON.stringify(writeConfig))
     fs.writeFileSync(this.configFile, encrypted)
   }

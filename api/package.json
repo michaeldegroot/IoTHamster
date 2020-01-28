@@ -15,17 +15,15 @@
     "express": "~4.16.1",
     "express-session": "^1.17.0",
     "glob": "^7.1.6",
-    "http-errors": "~1.6.3",
-    "jsonfile": "^5.0.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.20.8",
     "lodash": "^4.17.15",
     "morgan": "~1.9.1",
     "mysql2": "^2.1.0",
-    "objection": "^2.1.2",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "prompts": "^2.3.0",
-    "sqlite3": "^4.1.1"
+    "sqlite3": "^4.1.1",
+    "tcp-ping": "^0.1.1"
   }
 }

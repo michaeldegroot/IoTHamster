@@ -20,7 +20,7 @@
     "indent": [ "error", 2, { "SwitchCase": 1 } ],
     "key-spacing": [ "error", { "beforeColon": false } ],
     "no-console": "off",
-    object-property-newline: "error",
+    object-property-newline: "off",
     "no-fallthrough": "warn",
     "prefer-const": "error",
     "quotes": [ "error", "single" ],

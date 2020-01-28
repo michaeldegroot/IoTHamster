@@ -12,11 +12,11 @@ class Passport {
       new JwtStrategy(
         {
           jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
-          secretOrKey: modules.cipherchain.secret,
+          secretOrKey: modules.jwt.secret,
           passReqToCallback: true
         },
         async (req, payload, done) => {
-          await modules.database('logs').insert([
+          await modules.database.knex('logs').insert([
             {
               event: 'JwtStrategy',
               log: `device ${payload.device} requested ${req.originalUrl} and authenticated with jwt`,

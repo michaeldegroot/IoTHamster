@@ -4,11 +4,15 @@
 /node_modules
 /.pnp
 .pnp.js
+
+# certs
 certs/*.crt
 certs/*.key
-.config
-.masterkey
-.mastersalt
+
+# secrets or configs
+.config*
+.master*
+cipherchain_v*
 
 # testing
 /coverage
