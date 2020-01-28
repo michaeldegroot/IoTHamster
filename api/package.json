@@ -25,6 +25,7 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "prompts": "^2.3.0",
+    "pushbullet": "^2.4.0",
     "sqlite3": "^4.1.1",
     "tcp-ping": "^0.1.1"
   }

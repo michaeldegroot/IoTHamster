@@ -8,7 +8,6 @@ class Mqtt {
 
   async start(modules) {
     debug(`Trying to connect to ${process.env.MQTT_HOST}`)
-    console.log('use auth', !!+process.env.MQTT_REJECT_UNAUTHORIZED, process.env.MQTT_REJECT_UNAUTHORIZED)
     try {
       this.client = await mqtt.connectAsync({
         host: process.env.MQTT_HOST,
@@ -28,30 +27,31 @@ class Mqtt {
       process.exit()
     }
     debug('connected')
-    console.log(this.client)
 
     this.client.on('connect', function() {
-      this.client.subscribe('presence', function(err) {
-        if (!err) {
-          this.client.publish('presence', 'Hello mqtt')
-        }
-      })
+      debug('event connect')
+      // this.client.subscribe('presence', function(err) {
+      //   if (!err) {
+      //     this.client.publish('presence', 'Hello mqtt')
+      //   }
+      // })
     })
 
     this.client.on('offline', function() {
-      console.log('offline')
+      debug('event offline')
     })
 
     this.client.on('reconnect', function() {
-      console.log('reconnect')
+      debug('event reconnect')
     })
 
     this.client.on('error', function(error) {
+      debug('event error')
       console.log('ERROR: ', error)
     })
 
     this.client.on('message', function(topic, message) {
-      // message is Buffer
+      debug('event message')
       console.log(message.toString())
       this.client.end()
     })

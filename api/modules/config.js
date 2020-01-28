@@ -24,7 +24,8 @@ class Config {
       MQTT_USER: 'mqtt',
       MQTT_PASSWORD: 'mqtt',
       MQTT_TLS_METHOD: 'TLSv1_1_method',
-      MQTT_REJECT_UNAUTHORIZED: '1'
+      MQTT_REJECT_UNAUTHORIZED: '1',
+      PUSHBULLET_TOKEN: 'TOKEN'
     }
   }
 
@@ -57,14 +58,13 @@ class Config {
         fs.renameSync(oldName, newName)
         throw '.config is corrupt, renamed'
       }
-      console.log(e.message)
+      throw e
     }
 
     try {
       this.config = JSON.parse(config)
     } catch (e) {
       fs.unlinkSync(this.configFile)
-      console.log(e.message)
       throw '.config is corrupt, removed'
     }
 
@@ -74,9 +74,16 @@ class Config {
 
     const newKeys = _.difference(Object.keys(this.defaultConfig), Object.keys(this.config))
     const delKeys = _.difference(Object.keys(this.config), Object.keys(this.defaultConfig))
+    const askVals = {}
     for (const newKey of newKeys) {
       debug(`inserting key ${newKey} = ${this.defaultConfig[newKey]}`)
       this.config[newKey] = this.defaultConfig[newKey]
+      askVals[newKey] = this.defaultConfig[newKey]
+    }
+
+    if (Object.keys(askVals).length >= 1) {
+      const willUpdateVals = await this.askValues(askVals)
+      this.config = _.merge({}, this.config, willUpdateVals)
     }
 
     for (const delKey of delKeys) {

@@ -70,7 +70,7 @@ class Express {
 
     // ERROR
     this.app.use(function(err, req, res) {
-      console.log(err)
+      debug(err)
       res.json({ status: 500 })
     })
 
