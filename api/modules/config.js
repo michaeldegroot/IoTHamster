@@ -17,6 +17,7 @@ class Config {
       BIND_ADDRESS: '127.0.0.1',
       ENCRYPTION_AT_REST: '1',
       DATABASE_HOST: 'localhost',
+      DATABASE_PORT: '3306',
       DATABASE_USER: 'username',
       DATABASE_PASSWORD: 'password',
       DATABASE_DATABASE: 'database',
@@ -25,7 +26,8 @@ class Config {
       MQTT_PASSWORD: 'mqtt',
       MQTT_TLS_METHOD: 'TLSv1_1_method',
       MQTT_REJECT_UNAUTHORIZED: '1',
-      PUSHBULLET_TOKEN: 'TOKEN'
+      PUSHBULLET_TOKEN: 'TOKEN',
+      MQTT_PROTOCOL: 'mqtts'
     }
   }
 

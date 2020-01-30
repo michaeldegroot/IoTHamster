@@ -16,6 +16,16 @@ class Api {
       }, 100)
       res.json({ status: 200 })
     })
+    router.get('/status', async (req, res, next) => {
+      res.json({
+        status: 200,
+        data: {
+          mqtt: this.modules.mqtt.connected,
+          database: this.modules.database.connected,
+          pushbullet: this.modules.pushbullet.connected
+        }
+      })
+    })
 
     return router
   }
