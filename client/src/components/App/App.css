@@ -1,0 +1,25 @@
+body {
+  padding-top: 15rem;
+}
+
+@keyframes App-logo-spin {
+	from {
+	  transform: rotate(0deg);
+	}
+	to {
+	  transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.App-logo {
+	  animation: App-logo-spin infinite 70s linear;
+	  height: 30vmin;
+	  pointer-events: none;
+	}
+}
+
+.starter-template {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}

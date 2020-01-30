@@ -1,0 +1,37 @@
+<div class="box flex">
+    <img src="/logo192.png" />
+</div>
+
+<style>
+.box.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.box {
+  padding: .5rem;
+  height: 300px;
+}
+
+.sbl-circ {
+  height: 88px;
+  width: 88px;
+  color: white;
+  position: relative;
+  display: inline-block;
+  border: 5px solid;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: rotate .4s linear infinite;
+}
+
+@keyframes rotate {
+	0% {
+		transform: rotate(0); 
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+</style>
