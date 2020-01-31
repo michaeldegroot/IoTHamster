@@ -5,7 +5,6 @@
 #include <WiFiClientSecure.h>
 #include <SPI.h>
 #include <FS.h>
-#include <MFRC522.h>
 #include <PubSubClient.h>
 #include <NTPClient.h>
 #include <ArduinoJson.h>
