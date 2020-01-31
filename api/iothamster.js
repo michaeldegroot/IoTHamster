@@ -4,7 +4,20 @@ const glob = require('glob')
 
 class IoTHamster {
   constructor() {
-    const modules = ['masterkey', 'cipherchain', 'config', 'jwt', 'database', 'passport', 'express', 'mqtt', 'pushbullet', 'monitor', 'ifttt']
+    const modules = [
+      'masterkey',
+      'cipherchain',
+      'config',
+      'jwt',
+      'database',
+      'passport',
+      'express',
+      'mqttserver',
+      'mqttclient',
+      'pushbullet',
+      'monitor',
+      'ifttt'
+    ]
     this.modules = {}
     debug(`loading ${modules.length} modules`)
     for (const module of modules) {

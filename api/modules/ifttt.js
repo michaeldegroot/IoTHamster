@@ -1,6 +1,4 @@
-const fs = require('fs')
 const _ = require('lodash')
-const path = require('path')
 const debug = require('debug')('iothamster:ifttt')
 
 class Ifttt {
@@ -18,19 +16,31 @@ class Ifttt {
   }
 
   async ifttDelete(id) {
+    debug('delete', id)
     delete this.processes[id]
   }
 
   async ifttCreate(id, data) {
+    debug('create', id, data.if, data.then)
     this.processes[id] = { data }
 
     data.ifpayload = JSON.parse(data.ifpayload)
     data.thenpayload = JSON.parse(data.thenpayload)
 
+    this.if(data, async () => {
+      await this.then(data.then, data.thenpayload)
+    })
+  }
+
+  async if(data, callback) {
     if (data.if === 'mqtt_publish') {
-      const sub = await this.modules.mqtt.sub(data.ifpayload.topic)
+      const sub = await this.modules.mqttclient.sub(data.ifpayload.topic)
       sub.on('message', async payload => {
-        await this.then(data.then, data.thenpayload)
+        if (_.get(data.ifpayload, 'condition')) {
+          if (eval(data.ifpayload.condition)) {
+            return callback()
+          }
+        }
       })
     }
   }

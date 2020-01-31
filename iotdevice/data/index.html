@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="generator" content="IotHamster">
+    <title>Setup</title>
+    <link href="/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="apple-touch-icon" href="/logo.png" sizes="180x180">
+    <link rel="icon" href="/logo.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/logo.png" sizes="16x16" type="image/png">
+    <link rel="manifest" href="/logo.png">
+    <link rel="mask-icon" href="/logo.png" color="#563d7c">
+    <link rel="icon" href="/logo.png">
+    <meta name="theme-color" content="#563d7c">
+
+
+      <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .network {
+        cursor: pointer;
+      }
+    </style>
+    <link href="/style.css" rel="stylesheet">
+    <script src="/jquery.min.js"></script>
+    <script src="/popper.min.js"></script>
+    <script src="/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <form action="/send" method="post" class="form-signin">
+      <div class="text-center mb-4">
+        <img class="mb-4" src="/logo.png" width="128px">
+        <h1 class="h3 mb-3 font-weight-normal">Setup</h1>
+        <p>Fill in the forms to get started with your IoT device</p>
+      </div>
+
+      <div class="form-label-group"><ul class="list-group networks"></ul></div>
+
+      <div class="form-label-group">
+        <input type="hidden" id="wifi_ssid" class="form-control" placeholder="Wifi SSID" required autofocus>
+         <button class="btn btn-lg btn-success deleteSsid btn-block">Choose Wifi SSID</button>
+      </div>
+
+      <div class="form-label-group">
+        <input type="password" id="wifi_password" class="form-control" placeholder="Wifi Password" required>
+        <label for="wifi_password">Wifi Password</label>
+      </div>
+
+      <div class="form-label-group">
+        <input type="input" id="mqtt_host" class="ip form-control" placeholder="MQTT Host" required>
+        <label for="mqtt_host">MQTT Host</label>
+      </div>
+
+      <div class="form-label-group">
+        <input type="number" id="mqtt_port" class="form-control" placeholder="MQTT Port" required>
+        <label for="mqtt_port">MQTT Port</label>
+      </div>
+
+      <div class="form-label-group">
+        <input type="input" id="mqtt_username" class="form-control" placeholder="MQTT Username" required>
+        <label for="mqtt_username">MQTT Username</label>
+      </div>
+
+      <div class="form-label-group">
+        <input type="password" id="mqtt_password" class="form-control" placeholder="MQTT Password" required>
+        <label for="mqtt_password">MQTT Password</label>
+      </div>
+
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+    </form>
+
+    <script>
+      $(function() {
+        function proc(data) {
+          const networks = []
+          let min = 0
+          let max = 0
+          const procNetworks = data.split(',')
+          for (const network of procNetworks) {
+            // const ssid = network.
+
+            var myRegexp = /\[(.*?)\]\[(.*?)\]/;
+            match = myRegexp.exec(network);
+            if (match) {
+
+              console.log(match[1], match[2])
+              networks.push([match[1], match[2]])
+            }
+          }
+
+          networks.sort(function(a, b) {
+              return b[1] - a[1];
+          });
+
+          $('.network').remove()
+          for (const network of networks) {
+            $('.networks').append(`<li class="list-group-item network" network="${network[0]}">${network[0]} (${network[1]} dB)</li>`)
+          }
+          $('.networks').fadeOut('fast')
+
+          $('.network').unbind('click').bind('click', function(e) {
+            e.preventDefault()
+            $('.network').removeClass('active')
+            $(this).addClass('active')
+            $('#wifi_ssid').val($(this).attr('network'))
+            $('.networks').fadeOut('fast', function() {
+              $('.deleteSsid').fadeIn('fast')
+
+              $('.deleteSsid').unbind('click').bind('click', function(e) {
+                e.preventDefault()
+                $('.deleteSsid').fadeOut('fast', function() {
+                  $('.network').removeClass('active')
+                  $('.networks').fadeIn('fast')
+                })
+
+                return false
+              })
+            })
+
+            return false
+          })
+        }
+
+        proc(`[Ziggo69166][-69],[Ziggo][-69],[Ziggo][-76],[KPN Fon][-75],[ZiggoF9F6D19][-79],[VFNL-5442B0][-72],[ZiggoA6EB6A6][-86],[Ziggo][-86],[VGV75192DD1BA][-87],[H369A27A0D6][-82],[VRV9517052F53][-64],[ziggo-ap-eda12a8][-85],[UPC246834501][-86],[H369ADF9E25][-63],[Ziggo44648][-51],[Martine][-74],[Ziggo64543][-88],[Ziggo][-53],[Ziggo][-92],[Ziggo5C7E557][-95],`)
+        // $.get('/networks', function(data) { 
+        //   proc(data)
+        // })
+      })
+    </script>
+  </body>
+</html>

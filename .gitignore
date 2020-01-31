@@ -1,1 +1,4 @@
 .env
+iotdevice/data/**/*.der
+iotdevice/data/**/*.crt
+iotdevice/data/**/*.key

@@ -2,11 +2,11 @@ const mqtt = require('mqtt')
 const fs = require('fs')
 const path = require('path')
 const EventEmitter = require('events')
-const debug = require('debug')('iothamster:mqtt')
+const debug = require('debug')('iothamster:mqttclient')
 
-const certificate = path.join(__dirname, '..', 'certs', 'mqtt', 'certificate.crt')
+const certificate = path.join(__dirname, '..', 'certs', 'mqtt', 'server.crt')
 
-class Mqtt {
+class MqttClient {
   constructor() {
     this.connected = false
     if (!fs.existsSync(certificate)) {
@@ -14,7 +14,7 @@ class Mqtt {
     }
   }
 
-  async start(modules) {
+  async start() {
     await this.connect()
 
     this.events = {}
@@ -49,9 +49,10 @@ class Mqtt {
   }
 
   async connect() {
-    debug(`Trying to connect to ${process.env.MQTT_HOST}`)
+    debug(`Trying to connect to ${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`)
     this.client = mqtt.connect({
       host: process.env.MQTT_HOST,
+      port: process.env.MQTT_PORT,
       username: process.env.MQTT_USER,
       password: process.env.MQTT_PASSWORD,
       clientId: 'IoTHamster',
@@ -96,4 +97,4 @@ class Mqtt {
   }
 }
 
-module.exports = Mqtt
+module.exports = MqttClient

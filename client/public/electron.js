@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, screen, Tray } = require('electron')
+const { app, BrowserWindow, screen, Tray, Menu } = require('electron')
 const { is } = require('electron-util')
 const path = require('path')
 const url = require('url')
@@ -22,6 +22,20 @@ for (const filepath of files) {
 
 const createWindow = async () => {
   const tray = new Tray(resolve(path.join('public', 'favicon.ico')))
+  const trayMenu = Menu.buildFromTemplate([
+    {
+      label: 'Show',
+      click: () => {
+        mainWindow.restore()
+      }
+    },
+    {
+      label: 'Quit',
+      role: 'quit'
+    }
+  ])
+  tray.setContextMenu(trayMenu)
+
   await db.connect()
   const { screenWidth, screenHeight } = screen.getPrimaryDisplay().workAreaSize
   const mainWindowState = windowStateKeeper({
@@ -37,7 +51,6 @@ const createWindow = async () => {
     webPreferences: { nodeIntegration: true },
     show: false,
     center: true,
-    skipTaskbar: true,
     icon: resolve(path.join('public', 'favicon.ico'))
   })
 
@@ -56,12 +69,6 @@ const createWindow = async () => {
 
   mainWindowState.manage(mainWindow)
 
-  let splashStartUrl = url.format({
-    pathname: path.join(__dirname, '/../build/splash.html'),
-    protocol: 'file:',
-    slashes: true
-  })
-
   let startUrl = url.format({
     pathname: path.join(__dirname, '/../build/index.html'),
     protocol: 'file:',
@@ -70,11 +77,9 @@ const createWindow = async () => {
 
   if (isDev) {
     startUrl = 'http://localhost:3000'
-    splashStartUrl = 'http://localhost:3000/splash.html'
   }
-
+  splashWindow.loadFile(path.join(__dirname, 'splash.html'))
   mainWindow.loadURL(startUrl)
-  splashWindow.loadURL(splashStartUrl)
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
@@ -87,14 +92,24 @@ const createWindow = async () => {
   mainWindow.on('close', function(event) {
     event.preventDefault()
     mainWindow.hide()
+    setTimeout(() => {
+      mainWindow.show()
+    }, 5000)
     return false
+  })
+
+  mainWindow.on('restore', () => {
+    mainWindow.setSkipTaskbar(false)
+  })
+
+  mainWindow.on('minimize', () => {
+    mainWindow.setSkipTaskbar(true)
   })
 
   mainWindow.once('ready-to-show', () => {
     splashWindow.hide()
     mainWindow.show()
 
-    // Open the DevTools.
     if (isDev) {
       mainWindow.webContents.openDevTools()
     }
