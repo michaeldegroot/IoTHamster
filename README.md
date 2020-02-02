@@ -1,8 +1,8 @@
 # IoTHamster
 
-![](logo.png)
-
 ![](https://i.imgur.com/wC8Gzra.gif)
+
+Service software for centralizing your IoT devices, brings your devices together in a modern, fast and secure environment. Features device health uptime checks, push notifications, IFTTT, data encryption at rest. All linked up with your external or internal local MQTT broker. 
 
 ### Start frontend
 
