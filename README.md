@@ -2,6 +2,8 @@
 
 ![](logo.png)
 
+![](https://i.imgur.com/wC8Gzra.gif)
+
 ### Start frontend
 
 ```bash
